@@ -1,0 +1,57 @@
+import torch
+from transformers import pipeline, AutoModelForCausalLM, AutoTokenizer
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+
+# Model Selection: Using GPT-2
+MODEL_NAME = "gpt2"
+tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+model = AutoModelForCausalLM.from_pretrained(MODEL_NAME)
+
+
+def generate_text(prompt, max_length=50):
+    generator = pipeline("text-generation", model=model, tokenizer=tokenizer)
+    return generator(prompt, max_length=max_length, num_return_sequences=1)
+
+
+# Sample text inputs
+sample_inputs = [
+    "The future of artificial intelligence is",
+    "Once upon a time in a distant galaxy,",
+    "Machine learning models can understand",
+    "The best way to learn programming is",
+]
+
+# Generate responses
+responses = {inp: generate_text(inp)[0]["generated_text"] for inp in sample_inputs}
+
+# Display results
+for inp, resp in responses.items():
+    print(f"Prompt: {inp}\nGenerated Text: {resp}\n{'-'*50}")
+
+# Visualization: Token Distribution
+sample_text = "Artificial Intelligence is shaping the future."
+tokens = tokenizer.tokenize(sample_text)
+token_counts = pd.DataFrame(tokens, columns=["Token"])
+plt.figure(figsize=(10, 5))
+sns.countplot(y="Token", data=token_counts, palette="viridis")
+plt.title("Token Distribution in Sample Text")
+plt.show()
+
+# Research Questions:
+# 1. How well does GPT-2 understand context and coherence?
+# 2. What are its limitations in generating long-form responses?
+# 3. How does it handle ambiguous or abstract inputs?
+
+# Conclusion:
+# - GPT-2 performs well in short text generation but struggles with long-term coherence.
+# - Future improvements can involve fine-tuning on domain-specific data for better adaptability.
+
+
+import torch
+
+print(torch.__version__)
+import transformers
+
+print(transformers.__version__)
