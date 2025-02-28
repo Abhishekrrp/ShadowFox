@@ -1,0 +1,41 @@
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+
+NUM_SAMPLES = 1000
+IMAGE_SIZE = 32 * 32 * 4
+NUM_CLASSES = 12
+SPLIT_RATIO = 0.9
+
+def generate_dataset(num_samples, image_size):
+    return np.random.rand(num_samples, image_size)
+
+def generate_labels(num_samples, num_classes):
+    return np.random.randint(0, num_classes, num_samples)
+
+def normalize_dataset(dataset):
+    return dataset / 255.0
+
+def nearest_neighbor_classifier(train_data, train_labels, test_sample):
+    distances = np.linalg.norm(train_data - test_sample, axis=1)
+    return train_labels[np.argmin(distances)]
+
+def classify_test_set(x_train, y_train, x_test):
+    return np.array([nearest_neighbor_classifier(x_train, y_train, sample) for sample in x_test])
+
+# Generate dataset and labels
+x = generate_dataset(NUM_SAMPLES, IMAGE_SIZE)
+y = generate_labels(NUM_SAMPLES, NUM_CLASSES)
+
+# Normalize dataset
+x = normalize_dataset(x)
+
+# Split dataset into training and testing sets
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=(1 - SPLIT_RATIO), random_state=42)
+
+# Make predictions
+y_pred = classify_test_set(x_train, y_train, x_test)
+
+# Evaluate model
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Test accuracy: {accuracy}")
